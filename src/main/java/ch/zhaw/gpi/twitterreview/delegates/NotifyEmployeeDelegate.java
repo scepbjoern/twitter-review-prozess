@@ -1,8 +1,10 @@
 package ch.zhaw.gpi.twitterreview.delegates;
 
+import ch.zhaw.gpi.twitterreview.services.EmailService;
 import javax.inject.Named;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation des Send Task "Mitarbeiter benachrichtigen"
@@ -11,13 +13,17 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 @Named("notifyEmployeeAdapter")
 public class NotifyEmployeeDelegate implements JavaDelegate {
+    
+    // Verdrahten des MailServices
+    @Autowired
+    private EmailService emailService;
 
     /**
-     * Mockt das Senden einer Benachrichtigung per Mail
+     * Sendet eine Benachrichtigung per Mail
      * 
      * 1. Die benötigten Prozessvariablen auslesen
      * 2. Die E-Mail-Nachricht zusammenstellen
-     * 3. Die E-Mail in der Konsole ausgeben
+     * 3. Mail über Mailservice versenden
      * 
      * @param de
      * @throws Exception
@@ -48,11 +54,8 @@ public class NotifyEmployeeDelegate implements JavaDelegate {
                 "Veröffentlichen als Tweet vorgeschlagen:\n" + tweetContent + "\n\n" +
                 mailHauptteil + "\n\n" + "Deine Kommunikationsabteilung";
         
-        // Mail in Konsole ausgeben
-        System.out.println("########### BEGIN MAIL ##########################");
-        System.out.println("############################### Mail-Empfänger: " + email);
-        System.out.println(mailBody);
-        System.out.println("########### END MAIL ############################");
+        // Mail über Mailservice versenden
+        emailService.sendSimpleMail(email, "Neuigkeiten zu Ihrer Tweet-Anfrage", mailBody);
     }
     
 }
